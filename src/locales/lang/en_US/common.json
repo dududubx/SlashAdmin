@@ -17,6 +17,14 @@
 		"back": "Back",
 
 		"light": "Light",
-		"dark": "Dark"
+		"dark": "Dark",
+		"new": "New",
+		"name": "Name",
+		"icon": "Icon",
+		"route": "Route",
+		"status": "Status",
+		"order": "Order",
+		"action": "Action",
+		"edit": "Edit"
 	}
 }

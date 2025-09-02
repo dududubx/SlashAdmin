@@ -14,9 +14,9 @@ export default function ProtectedRoute({ children }: Props) {
 	const { accessToken } = useUserToken();
 
 	const check = useCallback(() => {
-		if (!accessToken) {
-			router.replace("/login");
-		}
+		// if (!accessToken) {
+		// 	router.replace("/login");
+		// }
 	}, [router, accessToken]);
 
 	useEffect(() => {

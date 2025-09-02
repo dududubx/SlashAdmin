@@ -86,6 +86,16 @@
 			"workbench": "工作台",
 			"analysis": "分析",
 			"management": "管理",
+			"menu": {
+				"index": "菜单管理",
+				"menuManage": "菜单管理",
+				"dynamicDemo": "动态路由演示",
+				"treeStructure": "树结构管理"
+			},
+			"order": {
+				"index": "订单管理",
+				"management": "订单管理"
+			},
 			"user": {
 				"index": "用户",
 				"profile": "个人资料",

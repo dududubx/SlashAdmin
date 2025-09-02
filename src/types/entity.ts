@@ -27,10 +27,10 @@ export interface Organization {
 
 export interface Permission {
 	id: string;
-	parentId: string;
+	parentId?: string;
 	name: string;
-	label: string;
-	type: PermissionType;
+	label?: string;
+	type?: PermissionType;
 	route: string;
 	status?: BasicStatus;
 	order?: number;

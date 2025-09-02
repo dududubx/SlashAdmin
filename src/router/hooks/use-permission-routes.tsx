@@ -1,6 +1,7 @@
 import { Icon } from "@/components/icon";
 import { CircleLoading } from "@/components/loading";
 import { useUserPermission } from "@/store/userStore";
+import { useDynamicRoutes as useDynamicRoutesStore, useRouteVersion } from "@/store/routeStore";
 import { flattenTrees } from "@/utils/tree";
 import { Tag } from "antd";
 import { isEmpty } from "ramda";
@@ -9,7 +10,7 @@ import { Navigate, Outlet } from "react-router";
 import type { Permission } from "#/entity";
 import { BasicStatus, PermissionType } from "#/enum";
 import type { AppRouteObject } from "#/router";
-import { getRoutesFromModules } from "../utils";
+import { getRoutesFromModules, getMenuRoutes } from "../utils";
 
 const ENTRY_PATH = "/src/pages";
 const PAGES = import.meta.glob("/src/pages/**/*.tsx");
@@ -32,11 +33,12 @@ function buildCompleteRoute(
 
 	// Base case: reached root permission
 	if (!permission.parentId) {
-		return `/${segments.join("/")}`;
+		return `/${segments.join("")}`;
 	}
 
 	// Find parent and continue recursion
 	const parent = flattenedPermissions.find((p) => p.id === permission.parentId);
+	console.log(parent, "parent");
 	if (!parent) {
 		console.warn(`Parent permission not found for ID: ${permission.parentId}`);
 		return `/${segments.join("/")}`;
@@ -59,12 +61,12 @@ function NewFeatureTag() {
 
 // Route Transformers
 const createBaseRoute = (permission: Permission, completeRoute: string): AppRouteObject => {
-	const { route, label, icon, order, hide, hideTab, status, frameSrc, newFeature } = permission;
+	const { route, name, icon, order, hide, hideTab, status, frameSrc, newFeature } = permission;
 
 	const baseRoute: AppRouteObject = {
 		path: route,
 		meta: {
-			label,
+			label: name,
 			key: completeRoute,
 			hideMenu: !!hide,
 			hideTab,
@@ -111,6 +113,7 @@ const createCatalogueRoute = (permission: Permission, flattenedPermissions: Perm
 };
 
 const createMenuRoute = (permission: Permission, flattenedPermissions: Permission[]): AppRouteObject => {
+	console.log(buildCompleteRoute(permission, flattenedPermissions), "buildCompleteRoute");
 	const baseRoute = createBaseRoute(permission, buildCompleteRoute(permission, flattenedPermissions));
 
 	if (permission.component) {
@@ -141,15 +144,43 @@ function transformPermissionsToRoutes(permissions: Permission[], flattenedPermis
 
 const ROUTE_MODE = import.meta.env.VITE_APP_ROUTER_MODE;
 export function usePermissionRoutes() {
+	const dynamicRoutes = useDynamicRoutesStore();
+	const routeVersion = useRouteVersion();
+
 	if (ROUTE_MODE === "module") {
-		return getRoutesFromModules();
+		const permissionRoutes = getRoutesFromModules();
+
+		// 合并静态路由和动态路由
+		const combinedRoutes = useMemo(() => {
+			const staticRoutes = getMenuRoutes(permissionRoutes);
+
+			// 如果有动态路由，将其转换为AppRouteObject格式并合并
+			if (dynamicRoutes && dynamicRoutes.length > 0) {
+				const flattenedDynamicRoutes = flattenTrees(staticRoutes as Permission[]);
+				const dynamicAppRoutes = transformPermissionsToRoutes(dynamicRoutes, flattenedDynamicRoutes);
+				console.log(
+					flattenedDynamicRoutes,
+					dynamicAppRoutes,
+					// buildTreeFromFlat([...flattenedDynamicRoutes, ...dynamicAppRoutes]),
+					"dynamicRoutes",
+				);
+				return [...staticRoutes, ...dynamicAppRoutes];
+			}
+
+			return staticRoutes;
+		}, [permissionRoutes, dynamicRoutes, routeVersion]);
+
+		return combinedRoutes;
 	}
 
+	// 权限模式：优先使用动态路由，如果没有则使用用户权限
 	const permissions = useUserPermission();
-	return useMemo(() => {
-		if (!permissions) return [];
+	const effectivePermissions = dynamicRoutes && dynamicRoutes.length > 0 ? dynamicRoutes : permissions;
 
-		const flattenedPermissions = flattenTrees(permissions);
-		return transformPermissionsToRoutes(permissions, flattenedPermissions);
-	}, [permissions]);
+	return useMemo(() => {
+		if (!effectivePermissions) return [];
+
+		const flattenedPermissions = flattenTrees(effectivePermissions);
+		return transformPermissionsToRoutes(effectivePermissions, flattenedPermissions);
+	}, [effectivePermissions, routeVersion]);
 }

@@ -1,18 +1,25 @@
 import { Suspense, lazy } from "react";
-import { Navigate, Outlet } from "react-router";
+import { Outlet } from "react-router";
 
 import { Icon } from "@/components/icon";
 import { CircleLoading } from "@/components/loading";
 
 import type { AppRouteObject } from "#/router";
 
-const ProfilePage = lazy(() => import("@/pages/management/user/profile"));
-const AccountPage = lazy(() => import("@/pages/management/user/account"));
+// const ProfilePage = lazy(() => import("@/pages/management/user/profile"));
+// const AccountPage = lazy(() => import("@/pages/management/user/account"));
 
-const OrganizationPage = lazy(() => import("@/pages/management/system/organization"));
-const PermissioPage = lazy(() => import("@/pages/management/system/permission"));
+// const OrganizationPage = lazy(
+//   () => import("@/pages/management/system/organization")
+// );
+// const PermissioPage = lazy(
+//   () => import("@/pages/management/system/permission")
+// );
+const MenuManagePage = lazy(() => import("@/pages/management/menu"));
+const DynamicRouteDemo = lazy(() => import("@/pages/management/menu/dynamic-route-demo"));
+const TreeStructureDemo = lazy(() => import("@/pages/management/menu/tree-structure-demo"));
 
-const Blog = lazy(() => import("@/pages/management/blog"));
+// const Blog = lazy(() => import("@/pages/management/blog"));
 
 const management: AppRouteObject = {
 	order: 2,
@@ -28,62 +35,96 @@ const management: AppRouteObject = {
 		key: "/management",
 	},
 	children: [
+		// {
+		//   index: true,
+		//   element: <Navigate to="user" replace />,
+		// },
+		// {
+		//   path: "user",
+		//   meta: { label: "sys.menu.user.index", key: "/management/user" },
+		//   children: [
+		//     {
+		//       index: true,
+		//       element: <Navigate to="profile" replace />,
+		//     },
+		//     {
+		//       path: "profile",
+		//       element: <ProfilePage />,
+		//       meta: {
+		//         label: "sys.menu.user.profile",
+		//         key: "/management/user/profile",
+		//       },
+		//     },
+		//     {
+		//       path: "account",
+		//       element: <AccountPage />,
+		//       meta: {
+		//         label: "sys.menu.user.account",
+		//         key: "/management/user/account",
+		//       },
+		//     },
+		//   ],
+		// },
+		// {
+		//   path: "system",
+		//   meta: { label: "sys.menu.system.index", key: "/management/system" },
+		//   children: [
+		//     {
+		//       path: "organization",
+		//       element: <OrganizationPage />,
+		//       meta: {
+		//         label: "sys.menu.system.organization",
+		//         key: "/management/system/organization",
+		//       },
+		//     },
+		//     {
+		//       path: "permission",
+		//       element: <PermissioPage />,
+		//       meta: {
+		//         label: "sys.menu.system.permission",
+		//         key: "/management/system/permission",
+		//       },
+		//     },
+		//   ],
+		// },
+		// {
+		//   path: "blog",
+		//   element: <Blog />,
+		//   meta: { label: "sys.menu.blog", key: "/management/blog" },
+		// },
 		{
-			index: true,
-			element: <Navigate to="user" replace />,
-		},
-		{
-			path: "user",
-			meta: { label: "sys.menu.user.index", key: "/management/user" },
+			path: "menu",
+			meta: { label: "sys.menu.menu.index", key: "/management/menu" },
 			children: [
+				// {
+				//   index: true,
+				//   element: <Navigate to="menuManage" replace />,
+				// },
 				{
-					index: true,
-					element: <Navigate to="profile" replace />,
-				},
-				{
-					path: "profile",
-					element: <ProfilePage />,
+					path: "menuManage",
+					element: <MenuManagePage />,
 					meta: {
-						label: "sys.menu.user.profile",
-						key: "/management/user/profile",
+						label: "sys.menu.menu.menuManage",
+						key: "/management/menu/menuManage",
 					},
 				},
 				{
-					path: "account",
-					element: <AccountPage />,
+					path: "dynamicDemo",
+					element: <DynamicRouteDemo />,
 					meta: {
-						label: "sys.menu.user.account",
-						key: "/management/user/account",
+						label: "sys.menu.menu.dynamicDemo",
+						key: "/management/menu/dynamicDemo",
+					},
+				},
+				{
+					path: "treeStructure",
+					element: <TreeStructureDemo />,
+					meta: {
+						label: "sys.menu.menu.treeStructure",
+						key: "/management/menu/treeStructure",
 					},
 				},
 			],
-		},
-		{
-			path: "system",
-			meta: { label: "sys.menu.system.index", key: "/management/system" },
-			children: [
-				{
-					path: "organization",
-					element: <OrganizationPage />,
-					meta: {
-						label: "sys.menu.system.organization",
-						key: "/management/system/organization",
-					},
-				},
-				{
-					path: "permission",
-					element: <PermissioPage />,
-					meta: {
-						label: "sys.menu.system.permission",
-						key: "/management/system/permission",
-					},
-				},
-			],
-		},
-		{
-			path: "blog",
-			element: <Blog />,
-			meta: { label: "sys.menu.blog", key: "/management/blog" },
 		},
 	],
 };

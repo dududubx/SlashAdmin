@@ -114,6 +114,16 @@
 			"functions": "Functions",
 			"clipboard": "Clipboard",
 			"token_expired": "Token Expired",
+			"menu": {
+				"index": "Menu",
+				"menuManage": "Menu Management",
+				"dynamicDemo": "Dynamic Route Demo",
+				"treeStructure": "Tree Structure Management"
+			},
+			"order": {
+				"index": "Order Management",
+				"management": "Order Management"
+			},
 			"menulevel": {
 				"index": "Menu Level",
 				"1a": "Menu Level 1a",

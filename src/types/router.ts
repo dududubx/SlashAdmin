@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import type { Params, RouteObject } from "react-router";
 
 export interface RouteMeta {
@@ -50,7 +50,15 @@ export interface RouteMeta {
 	params?: Params<string>;
 }
 export type AppRouteObject = {
+	parentId?: string;
 	order?: number;
 	meta?: RouteMeta;
 	children?: AppRouteObject[];
 } & Omit<RouteObject, "children">;
+
+export type dynamicRoutes = RouteMeta & {
+	parentId?: string;
+	component?: string;
+	order?: number;
+	route?: string;
+};

@@ -1,9 +1,9 @@
-import { useMutation } from "@tanstack/react-query";
+// import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import userService, { type SignInReq } from "@/api/services/userService";
+import { type SignInReq } from "@/api/services/userService";
 
 import { toast } from "sonner";
 import type { UserInfo, UserToken } from "#/entity";
@@ -52,24 +52,24 @@ const useUserStore = create<UserStore>()(
 
 export const useUserInfo = () => useUserStore((state) => state.userInfo);
 export const useUserToken = () => useUserStore((state) => state.userToken);
-export const useUserPermission = () =>
-	useUserStore((state) => state.userInfo.permissions);
+export const useUserPermission = () => useUserStore((state) => state.userInfo.permissions);
 export const useUserActions = () => useUserStore((state) => state.actions);
 
 export const useSignIn = () => {
 	const navigatge = useNavigate();
-	const { setUserToken, setUserInfo } = useUserActions();
+	// const { setUserToken, setUserInfo } = useUserActions();
 
-	const signInMutation = useMutation({
-		mutationFn: userService.signin,
-	});
+	// const signInMutation = useMutation({
+	// 	mutationFn: userService.signin,
+	// });
 
 	const signIn = async (data: SignInReq) => {
 		try {
-			const res = await signInMutation.mutateAsync(data);
-			const { user, accessToken, refreshToken } = res;
-			setUserToken({ accessToken, refreshToken });
-			setUserInfo(user);
+			// const res = await signInMutation.mutateAsync(data);
+			// const { user, accessToken, refreshToken } = res;
+			// setUserToken({ accessToken, refreshToken });
+			// setUserInfo(user);
+			console.log(data);
 			navigatge(HOMEPAGE, { replace: true });
 			toast.success("Sign in success!");
 		} catch (err) {

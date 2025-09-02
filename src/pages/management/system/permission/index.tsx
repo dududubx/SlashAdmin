@@ -24,10 +24,9 @@ const defaultPermissionValue: Permission = {
 export default function PermissionPage() {
 	const permissions = useUserPermission();
 	const { t } = useTranslation();
-
 	const [permissionModalProps, setPermissionModalProps] = useState<PermissionModalProps>({
 		formValue: { ...defaultPermissionValue },
-		title: "New",
+		title: t("common.new"),
 		show: false,
 		onOk: () => {
 			setPermissionModalProps((prev) => ({ ...prev, show: false }));
@@ -41,13 +40,13 @@ export default function PermissionPage() {
 			title: "Name",
 			dataIndex: "name",
 			width: 300,
-			render: (_, record) => <div>{t(record.label)}</div>,
+			render: (_, record) => <div>{t(record.label || "")}</div>,
 		},
 		{
 			title: "Type",
 			dataIndex: "type",
 			width: 60,
-			render: (_, record) => <Tag color="processing">{PermissionType[record.type]}</Tag>,
+			render: (_, record) => <Tag color="processing">{PermissionType[record.type ?? 1]}</Tag>,
 		},
 		{
 			title: "Icon",
@@ -125,7 +124,7 @@ export default function PermissionPage() {
 			title="Permission List"
 			extra={
 				<Button type="primary" onClick={() => onCreate()}>
-					New
+					{t("common.new")}
 				</Button>
 			}
 		>

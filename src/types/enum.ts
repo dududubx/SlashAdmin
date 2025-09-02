@@ -2,7 +2,10 @@ export enum BasicStatus {
 	DISABLE = 0,
 	ENABLE = 1,
 }
-
+export enum MenuStatus {
+	SHOW = 0,
+	HIDDEN = 1,
+}
 export enum ResultEnum {
 	SUCCESS = 0,
 	ERROR = -1,
@@ -14,6 +17,7 @@ export enum StorageEnum {
 	UserToken = "userToken",
 	Settings = "settings",
 	I18N = "i18nextLng",
+	DynamicRoutes = "dynamicRoutes",
 }
 
 export enum ThemeMode {

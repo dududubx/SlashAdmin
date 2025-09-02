@@ -9,10 +9,11 @@ export const menuFilter = (items: AppRouteObject[]) => {
 	return items
 		.filter((item) => {
 			const show = item.meta?.key;
-			if (show && item.children) {
+			const hideMenu = item.meta?.hideMenu;
+			if (show && item.children && !hideMenu) {
 				item.children = menuFilter(item.children);
 			}
-			return show;
+			return show && !hideMenu;
 		})
 		.sort(ascend((item) => item.order || Number.POSITIVE_INFINITY));
 };
@@ -22,11 +23,18 @@ export const menuFilter = (items: AppRouteObject[]) => {
  */
 export function getRoutesFromModules() {
 	const menuModules: AppRouteObject[] = [];
+	const showMenu: string[] = ["management", "order"];
 
 	const modules = import.meta.glob("./routes/modules/**/*.tsx", {
 		eager: true,
 	});
+
 	for (const key in modules) {
+		const isAllowed = showMenu.some((menu) => {
+			// 匹配 ./routes/modules/dashboard.tsx 或 ./routes/modules/dashboard/xxx.tsx
+			return key.includes(`/modules/${menu}.tsx`) || key.includes(`/modules/${menu}/`);
+		});
+		if (!isAllowed) continue;
 		const mod = (modules as any)[key].default || {};
 		const modList = Array.isArray(mod) ? [...mod] : [mod];
 		menuModules.push(...modList);

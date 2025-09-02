@@ -134,6 +134,9 @@ importers:
       i18next-browser-languagedetector:
         specifier: ^7.2.1
         version: 7.2.2
+      is-between:
+        specifier: ^0.0.0
+        version: 0.0.0
       lucide-react:
         specifier: ^0.487.0
         version: 0.487.0(react@18.2.0)
@@ -146,6 +149,9 @@ importers:
       ramda:
         specifier: ^0.29.1
         version: 0.29.1
+      rc-picker:
+        specifier: ^4.11.3
+        version: 4.11.3(dayjs@1.11.13)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -2702,6 +2708,9 @@ packages:
   is-async-function@2.1.1:
     resolution: {integrity: sha512-9dgM/cZBnNvjzaMYHVoxxfPj2QXt22Ev7SuuPrs+xav0ukGB0S6d4ydZdEiM48kLx5kDV+QBPrpVnFyefL8kkQ==}
     engines: {node: '>= 0.4'}
+
+  is-between@0.0.0:
+    resolution: {integrity: sha512-3EUy+6YjXYEIE6SxLeR1tgCV5eLBLq/Rr3m0rJDDkFFvpUlvC/i9CfbesTsVhFt1RxHiK15A2DQfDZh9A3JOug==}
 
   is-bigint@1.1.0:
     resolution: {integrity: sha512-n4ZT37wG78iz03xPRKJrHTdZbe3IicyucEtdRsV5yglwc3GyUfbAfpSeD0FJ41NbUNSt5wbhqfp1fS+BgnvDFQ==}
@@ -7341,6 +7350,8 @@ snapshots:
       get-proto: 1.0.1
       has-tostringtag: 1.0.2
       safe-regex-test: 1.1.0
+
+  is-between@0.0.0: {}
 
   is-bigint@1.1.0:
     dependencies:
