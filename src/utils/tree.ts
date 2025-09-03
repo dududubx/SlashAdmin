@@ -37,7 +37,7 @@ export function buildTreeFromFlat<T extends Record<string, any>>(
 		const node = { ...item, [childrenKey]: [] };
 		nodeMap.set(item[idKey], node);
 	});
-
+	const allNodes = Array.from(nodeMap.values());
 	// 构建树结构
 	flatArray.forEach((item) => {
 		const node = nodeMap.get(item[idKey])!;
@@ -57,7 +57,11 @@ export function buildTreeFromFlat<T extends Record<string, any>>(
 			}
 		}
 	});
-
+	allNodes.forEach((node) => {
+		if (node[childrenKey].length === 0) {
+			delete node[childrenKey];
+		}
+	});
 	return result;
 }
 

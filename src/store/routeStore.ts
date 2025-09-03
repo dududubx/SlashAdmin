@@ -4,21 +4,24 @@ import type { Permission } from "#/entity";
 import type { AppRouteObject } from "#/router";
 import { StorageEnum } from "#/enum";
 import { buildTreeFromFlat, flattenTrees } from "@/utils/tree";
-import { getRoutesFromModules } from "@/router/utils";
+import { getRoutesFromModules, getMenuRoutes } from "@/router/utils";
 import { PermissionType, BasicStatus } from "#/enum";
 import { faker } from "@faker-js/faker";
+import { useTranslation } from "react-i18next";
 
 /**
  * 将 AppRouteObject 转换为 Permission 格式
  */
 function convertAppRoutesToPermissions(routes: AppRouteObject[], parentId: string = ""): Permission[] {
+	const { t } = useTranslation();
 	return routes.map((route) => {
 		const permission: Permission = {
-			id: route.meta?.key || faker.string.uuid(),
+			id: route.id || faker.string.uuid(),
 			name: route.meta?.label || route.path || "",
+			label: t(route.meta?.label || ""),
 			route: route.path || "",
 			type: route.children && route.children.length > 0 ? PermissionType.CATALOGUE : PermissionType.MENU,
-			parentId,
+			parentId: route.parentId || parentId,
 			order: route.order || 0,
 			hide: route.meta?.hideMenu || false,
 			status: route.meta?.disabled ? BasicStatus.DISABLE : BasicStatus.ENABLE,
@@ -53,7 +56,7 @@ type RouteStore = {
 	// 动态路由数据（扁平化存储）
 	dynamicRoutes: Permission[];
 	// 静态路由
-	staticRoutes: Permission[];
+	staticRoutes: AppRouteObject[];
 	// 是否需要刷新路由
 	needRefresh: boolean;
 	// 路由版本号，用于强制刷新
@@ -63,7 +66,7 @@ type RouteStore = {
 		// 设置动态路由
 		setDynamicRoutes: (routes: Permission[]) => void;
 		// 设置静态路由
-		setStaticRoutes: (routes: Permission[]) => void;
+		setStaticRoutes: (routes: AppRouteObject[]) => void;
 		// 智能添加路由（自动处理树结构）
 		addRouteToTree: (route: Permission, parentId?: string) => void;
 		// 智能更新路由（保持树结构）
@@ -91,7 +94,7 @@ const useRouteStore = create<RouteStore>()(
 	persist(
 		(set, get) => ({
 			dynamicRoutes: [] as Permission[],
-			staticRoutes: [] as Permission[],
+			staticRoutes: [] as AppRouteObject[],
 			needRefresh: false,
 			routeVersion: 0,
 
@@ -171,17 +174,20 @@ const useRouteStore = create<RouteStore>()(
 
 					// 如果静态路由为空，从模块中获取
 					let currentStaticRoutes = staticRoutes;
+					let moduleRoutes = [] as AppRouteObject[];
 					if (currentStaticRoutes.length === 0) {
-						const moduleRoutes = getRoutesFromModules();
+						const allRoutes = getRoutesFromModules();
 						// 将 AppRouteObject 转换为 Permission 格式
-						const convertedRoutes = convertAppRoutesToPermissions(moduleRoutes);
-						currentStaticRoutes = convertedRoutes;
+						const staticRoutes = getMenuRoutes(allRoutes);
+						moduleRoutes = staticRoutes;
 						// 更新静态路由存储
-						set({ staticRoutes: convertedRoutes });
+						set({ staticRoutes: staticRoutes });
+					} else {
+						moduleRoutes = currentStaticRoutes;
 					}
-
-					const flatStaticRoutes = flattenTrees(currentStaticRoutes);
-					return [...flatStaticRoutes, ...dynamicRoutes];
+					const convertedRoutes = convertAppRoutesToPermissions(moduleRoutes);
+					const flatStaticRoutes = flattenTrees(convertedRoutes);
+					return buildTreeFromFlat([...flatStaticRoutes, ...dynamicRoutes]);
 				},
 				addRoute: (route) => {
 					const currentRoutes = get().dynamicRoutes;
@@ -231,6 +237,7 @@ const useRouteStore = create<RouteStore>()(
 			storage: createJSONStorage(() => localStorage),
 			partialize: (state) => ({
 				[StorageEnum.DynamicRoutes]: state.dynamicRoutes,
+				// [StorageEnum.staticRoutes]: state.staticRoutes,
 				routeVersion: state.routeVersion,
 			}),
 		},
@@ -241,5 +248,6 @@ export const useDynamicRoutes = () => useRouteStore((state) => state.dynamicRout
 export const useRouteVersion = () => useRouteStore((state) => state.routeVersion);
 export const useNeedRefresh = () => useRouteStore((state) => state.needRefresh);
 export const useRouteActions = () => useRouteStore((state) => state.actions);
+export const useStaticRoutes = () => useRouteStore((state) => state.staticRoutes);
 
 export default useRouteStore;

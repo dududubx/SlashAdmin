@@ -1,15 +1,18 @@
 import { ascend } from "ramda";
+import { faker } from "@faker-js/faker";
 
 import type { AppRouteObject, RouteMeta } from "#/router";
 
 /**
  * return menu routes
  */
-export const menuFilter = (items: AppRouteObject[]) => {
+export const menuFilter = (items: AppRouteObject[], parentId = "") => {
 	return items
 		.filter((item) => {
 			const show = item.meta?.key;
 			const hideMenu = item.meta?.hideMenu;
+			item.id = faker.string.uuid();
+			item.parentId = parentId;
 			if (show && item.children && !hideMenu) {
 				item.children = menuFilter(item.children);
 			}

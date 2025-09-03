@@ -2,7 +2,7 @@ import { Icon } from "@/components/icon";
 import { CircleLoading } from "@/components/loading";
 import { useUserPermission } from "@/store/userStore";
 import { useDynamicRoutes as useDynamicRoutesStore, useRouteVersion } from "@/store/routeStore";
-import { flattenTrees } from "@/utils/tree";
+import { flattenTrees, buildTreeFromFlat } from "@/utils/tree";
 import { Tag } from "antd";
 import { isEmpty } from "ramda";
 import { Suspense, lazy, useMemo } from "react";
@@ -11,6 +11,7 @@ import type { Permission } from "#/entity";
 import { BasicStatus, PermissionType } from "#/enum";
 import type { AppRouteObject } from "#/router";
 import { getRoutesFromModules, getMenuRoutes } from "../utils";
+import { useStaticRoutes, useRouteActions } from "@/store/routeStore";
 
 const ENTRY_PATH = "/src/pages";
 const PAGES = import.meta.glob("/src/pages/**/*.tsx");
@@ -146,27 +147,32 @@ const ROUTE_MODE = import.meta.env.VITE_APP_ROUTER_MODE;
 export function usePermissionRoutes() {
 	const dynamicRoutes = useDynamicRoutesStore();
 	const routeVersion = useRouteVersion();
+	const routeActions = useRouteActions();
+	const { setStaticRoutes } = routeActions;
+	const getStaticRoutes = useStaticRoutes();
 
 	if (ROUTE_MODE === "module") {
 		const permissionRoutes = getRoutesFromModules();
 
 		// 合并静态路由和动态路由
 		const combinedRoutes = useMemo(() => {
-			const staticRoutes = getMenuRoutes(permissionRoutes);
-
+			const staticRoutes = getStaticRoutes.length ? getStaticRoutes : getMenuRoutes(permissionRoutes);
+			if (!getStaticRoutes.length) {
+				setStaticRoutes(staticRoutes as Permission[]);
+			}
 			// 如果有动态路由，将其转换为AppRouteObject格式并合并
 			if (dynamicRoutes && dynamicRoutes.length > 0) {
 				const flattenedDynamicRoutes = flattenTrees(staticRoutes as Permission[]);
 				const dynamicAppRoutes = transformPermissionsToRoutes(dynamicRoutes, flattenedDynamicRoutes);
-				console.log(
-					flattenedDynamicRoutes,
-					dynamicAppRoutes,
-					// buildTreeFromFlat([...flattenedDynamicRoutes, ...dynamicAppRoutes]),
-					"dynamicRoutes",
-				);
-				return [...staticRoutes, ...dynamicAppRoutes];
-			}
 
+				return buildTreeFromFlat([...flattenedDynamicRoutes, ...dynamicAppRoutes]);
+			}
+			console.log(
+				staticRoutes,
+				dynamicRoutes,
+				// buildTreeFromFlat([...flattenedDynamicRoutes, ...dynamicAppRoutes]),
+				"dynamicRoutes",
+			);
 			return staticRoutes;
 		}, [permissionRoutes, dynamicRoutes, routeVersion]);
 

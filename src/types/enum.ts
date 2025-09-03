@@ -18,6 +18,7 @@ export enum StorageEnum {
 	Settings = "settings",
 	I18N = "i18nextLng",
 	DynamicRoutes = "dynamicRoutes",
+	staticRoutes = "staticRoutes",
 }
 
 export enum ThemeMode {

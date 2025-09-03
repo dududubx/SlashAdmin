@@ -4,12 +4,13 @@ import { Icon, IconButton } from "@/components/icon";
 import { MenuStatus } from "#/enum";
 import type { Permission } from "#/entity";
 import { useTranslation } from "react-i18next";
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 import MenuModal, { type MenuModalProps } from "./menu-modal";
-import type { AppRouteObject } from "#/router";
+// import type { AppRouteObject } from "#/router";
 import { faker } from "@faker-js/faker";
 import { useDynamicRoutes } from "@/hooks/use-dynamic-routes";
-import { usePermissionRoutes } from "@/router/hooks/use-permission-routes";
+// import { usePermissionRoutes } from "@/router/hooks/use-permission-routes";
+import { useRouteActions } from "@/store/routeStore";
 
 const defaultRouteValue: Permission = {
 	id: "",
@@ -23,35 +24,10 @@ const defaultRouteValue: Permission = {
 };
 export default function MenuManagePage() {
 	const { t } = useTranslation();
-	const modulesMenu = usePermissionRoutes();
 	const { addDynamicRouteToTree, updateDynamicRouteInTree, removeDynamicRouteFromTree, refreshRoutes } =
 		useDynamicRoutes();
-	const menuToTableData = (menuList: AppRouteObject[], tableList: (Permission | AppRouteObject)[]) => {
-		menuList.forEach((item) => {
-			const icon = item.meta?.icon;
-			const obj = {
-				name: item.meta?.label || "",
-				label: t(item.meta?.label || ""),
-				icon: typeof icon === "string" ? icon : React.isValidElement(icon) ? icon.props?.icon : "",
-				route: item.meta?.key || "",
-				children: [],
-				order: item.order,
-				hide: false,
-				isChild: !(item.children && item.children.length),
-				id: item.id,
-				parentId: item.parentId,
-			};
-			tableList.push(obj);
-			if (item.children && item.children.length) {
-				menuToTableData(item.children, obj.children);
-			}
-		});
-	};
-	const tableData = useMemo(() => {
-		const tableList: Permission[] = [];
-		menuToTableData(modulesMenu, tableList);
-		return tableList;
-	}, [modulesMenu]);
+	const { getAllFlatRoutes } = useRouteActions();
+	const tableData = getAllFlatRoutes();
 	console.log(tableData, "tableData");
 	const onSubmit = useCallback(
 		async (values: Permission) => {
